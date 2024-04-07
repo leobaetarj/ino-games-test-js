@@ -1,3 +1,4 @@
+export class InvalidSymbolError extends Error {}
 
 type WinningCombinationsResult = [number, number[]][];
 

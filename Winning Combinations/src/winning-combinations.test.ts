@@ -1,4 +1,4 @@
-import { WinningCombinations } from './winning-combinations';
+import { WinningCombinations, InvalidSymbolError } from './winning-combinations';
 
 test.each([
   [[1, 6, 6, 7, 2, 3], []],
@@ -33,3 +33,8 @@ test.each([
     const received = WinningCombinations.call(line);
     expect(received).toEqual(expected);
   });
+
+test('when symbol is unknown throws an error', () => {
+  const unknownSymbol = 99
+  expect(() => WinningCombinations.call([unknownSymbol, 1, 4, 4, 8])).toThrow(InvalidSymbolError)
+})
