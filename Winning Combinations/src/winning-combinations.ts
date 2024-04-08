@@ -24,9 +24,8 @@ function isElegibleSymbol(symbol: number): boolean {
   return !isWildSymbol && isPayingSymbols
 }
 
-function buildAllWildWinningCombinationsResult(columnsCount: number): WinningCombinationsResult {
-  const { wildSymbol } = config;
-  return [[wildSymbol, Array.from({length: columnsCount}, (_, i) => i)]];
+function buildAllPositions(columnsCount: number): number[] {
+  return Array.from({length: columnsCount}, (_, i) => i);
 }
 
 function replaceWildToSymbolInLine(lineSymbols: number[], symbol: number): number[] {
@@ -59,7 +58,8 @@ function buildSymbolSequences(line: number[], symbol: number): number[][] {
 
 
 function getPaylinePositionsBySymbol(line: number[], symbol: number): number[] | null {
-  const sequencesBySymbol = buildSymbolSequences(line, symbol);
+  const lineWithReplacedWilds = replaceWildToSymbolInLine(line, symbol);
+  const sequencesBySymbol = buildSymbolSequences(lineWithReplacedWilds, symbol);
 
   return findPaylinePositions(sequencesBySymbol) || null;
 }
@@ -80,11 +80,10 @@ function call(line: number[]): WinningCombinationsResult {
 
   validateSymbols(uniqueSymbols);
 
-  const { wildSymbol } = config;
-  
-  const isOnlyWildSymbol = uniqueSymbols.length === 1 && uniqueSymbols[0] === wildSymbol;
+  const isOnlyWildSymbol = uniqueSymbols.length === 1 && uniqueSymbols[0] === config.wildSymbol;
   if (isOnlyWildSymbol) {
-    return buildAllWildWinningCombinationsResult(line.length);
+    const paylinePositions = buildAllPositions(line.length);
+    return [[config.wildSymbol, paylinePositions]];
   }
 
   let winningCombinationsResult: WinningCombinationsResult = [];
@@ -93,8 +92,7 @@ function call(line: number[]): WinningCombinationsResult {
       return false;
     }
 
-    const lineWithReplacedWilds = replaceWildToSymbolInLine(line, symbol);
-    const paylinePositions = getPaylinePositionsBySymbol(lineWithReplacedWilds, symbol);
+    const paylinePositions = getPaylinePositionsBySymbol(line, symbol);
     if(paylinePositions) {
       winningCombinationsResult.push([symbol, paylinePositions])
     }
