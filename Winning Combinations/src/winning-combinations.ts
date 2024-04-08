@@ -39,6 +39,11 @@ function replaceWildToSymbolInLine(lineSymbols: number[], symbol: number): numbe
   });
 }
 
+function findPaylinePositions(sequences: number[][]): number[] | undefined {
+  const { minSequenceLength } = config;
+  return sequences.find((sequence: number[]) => sequence.length >= minSequenceLength);
+}
+
 function buildSymbolSequences(line: number[], symbol: number): number[][] {
   return line.reduce((acc: number[][], currentSymbol, index) => {
     if (currentSymbol === symbol) {
@@ -52,9 +57,11 @@ function buildSymbolSequences(line: number[], symbol: number): number[][] {
   }, []);
 }
 
-function findPaylinePositions(sequences: number[][]): number[] | undefined {
-  const { minSequenceLength } = config;
-  return sequences.find((sequence: number[]) => sequence.length >= minSequenceLength);
+
+function getPaylinePositionsBySymbol(line: number[], symbol: number): number[] | null {
+  const sequencesBySymbol = buildSymbolSequences(line, symbol);
+
+  return findPaylinePositions(sequencesBySymbol) || null;
 }
 
 function validateSymbols(symbols: number[]) {
@@ -87,9 +94,7 @@ function call(line: number[]): WinningCombinationsResult {
     }
 
     const lineWithReplacedWilds = replaceWildToSymbolInLine(line, symbol);
-    const symbolSequences = buildSymbolSequences(lineWithReplacedWilds, symbol);
-
-    const paylinePositions = findPaylinePositions(symbolSequences);
+    const paylinePositions = getPaylinePositionsBySymbol(lineWithReplacedWilds, symbol);
     if(paylinePositions) {
       winningCombinationsResult.push([symbol, paylinePositions])
     }
